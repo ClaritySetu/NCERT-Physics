@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>NCERT Physics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NCERT Quiz - Mobile Ready</title>
     
     <script>
         window.MathJax = {
@@ -12,26 +11,25 @@
             svg: { fontCache: 'global' }
         };
     </script>
-    
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* ================================================================= */
-        /* 3. THEME CONFIGURATION                                            */
-        /* ================================================================= */
+        /* --- THEME --- */
         :root {
             --bg-primary: #131314;       
             --bg-secondary: #1e1f20;     
             --text-main: #e3e3e3;        
-            --text-dim: #c4c7c5;         
+            --text-dim: #9aa0a6;         
             --accent: #8ab4f8;           
             --success: #34a853;          
             --error: #ea4335;            
             --flag: #fbbc04;             
-            --border: #444746;           
-            --item-hover: #2d2e30;       
+            --border: #3c4043;           
+            --item-hover: #303134;       
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -45,58 +43,34 @@
             user-select: none;
         }
 
-        /* --- TOOLTIP STYLES --- */
-        .tooltip-wrap {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .tooltip-wrap::after {
-            content: attr(data-tip);
-            position: absolute;
-            bottom: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 180px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
-            font-size: 0.75rem;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 10;
-            border: 1px solid #555;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .tooltip-wrap:hover::after {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* --- HEADER STYLES --- */
+        /* --- HEADER --- */
         header {
-            padding: 12px 25px;
+            padding: 10px 20px;
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            height: 60px;
         }
 
-        .quiz-title { font-size: 1.2rem; color: var(--accent); margin: 0; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        
+        .quiz-title { font-size: 1.1rem; color: var(--accent); margin: 0; font-weight: 500; }
+        
+        /* Mobile Menu Button */
+        #btn-menu {
+            background: transparent; border: none; color: var(--text-main);
+            font-size: 1.5rem; cursor: pointer; display: none; padding: 5px;
+        }
 
-        /* --- LAYOUT STRUCTURE --- */
-        .layout { display: flex; flex: 1; overflow: hidden; }
+        /* --- LAYOUT --- */
+        .layout { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* Sidebar (Palette) Styles */
+        /* Sidebar (Desktop Default) */
         .sidebar {
-            width: 140px;
+            width: 260px;
             background: var(--bg-secondary);
             border-right: 1px solid var(--border);
             padding: 15px;
@@ -104,149 +78,174 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
+            z-index: 50;
         }
+
+        .palette-header { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
         .palette-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); 
+            grid-template-columns: repeat(5, 1fr);
             gap: 8px;
         }
 
+        /* --- BUTTON SHAPE: Change border-radius here --- */
         .p-item {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            aspect-ratio: 1;
+            display: flex; align-items: center; justify-content: center;
             border: 1px solid var(--border);
-            border-radius: 12px 0px 12px 0px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: var(--text-dim);
+            border-radius: 8px; /* Change to 50% for circles */
+            cursor: pointer; font-size: 0.9rem; color: var(--text-dim);
             transition: 0.2s;
         }
-
-        .p-item:hover { background: var(--item-hover); }
+        .p-item:active { transform: scale(0.95); }
         .p-item.current { border-color: var(--accent); color: var(--accent); background: rgba(138, 180, 248, 0.1); border-width: 2px; font-weight: bold; }
         .p-item.attempted { background: var(--success); color: white; border-color: var(--success); }
         .p-item.flagged { background: var(--flag); color: black; border-color: var(--flag); }
 
-        /* Main Content Area */
+        /* Main Content */
         .main-content {
             flex: 1;
-            padding: 20px 40px;
+            padding: 30px;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
 
-        .question-container { max-width: 800px; margin: 0 auto; width: 100%; padding-bottom: 50px; }
+        .question-container { max-width: 800px; margin: 0 auto; width: 100%; padding-bottom: 80px; }
 
-        /* Typography */
-        .section-label { color: var(--accent); font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
-        .question-text { font-size: 1.2rem; line-height: 1.5; margin-bottom: 25px; }
+        .section-label { color: var(--accent); font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; font-weight: bold; display: inline-block; background: rgba(138, 180, 248, 0.1); padding: 4px 8px; border-radius: 4px; }
+        
+        .question-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; overflow-x: auto; }
 
-        /* Option Buttons */
         .option {
             background: var(--bg-secondary);
-            padding: 15px 20px;
-            margin-bottom: 10px;
-            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-radius: 12px;
             cursor: pointer;
             border: 1px solid var(--border);
-            font-size: 0.95rem;
-            transition: 0.2s;
+            font-size: 1rem;
+            transition: background 0.2s;
+            display: flex; align-items: center;
         }
 
-        .option:hover:not(.disabled) { border-color: var(--accent); background: var(--item-hover); transform: translateX(5px); }
+        .option:active { background: var(--item-hover); }
         .option.selected { border-color: var(--accent); background: rgba(138, 180, 248, 0.1); }
         .option.correct { background: rgba(52, 168, 83, 0.25) !important; border-color: var(--success) !important; }
         .option.wrong { background: rgba(234, 67, 53, 0.25) !important; border-color: var(--error) !important; }
-        .option.disabled { cursor: default; }
+        .option.disabled { pointer-events: none; }
 
-        /* Feedback Box */
-        .feedback-card { display: none; margin-top: 20px; padding: 15px; background: #1e1f20; border-left: 4px solid var(--accent); border-radius: 8px; }
-        .cite-tag { font-size: 0.75rem; color: var(--accent); font-weight: bold; display: block; margin-bottom: 5px; }
+        .feedback-card { display: none; margin-top: 20px; padding: 15px; background: #232425; border-left: 4px solid var(--accent); border-radius: 8px; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Controls */
-        .controls { margin-top: 30px; display: flex; justify-content: space-between; }
+        .controls { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; }
         
-        button { padding: 10px 20px; border-radius: 20px; border: none; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        button { padding: 12px 24px; border-radius: 24px; border: none; font-weight: 600; cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
         .btn-primary { background: var(--accent); color: var(--bg-primary); }
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
         .btn-flag { color: var(--flag); border: 1px solid var(--flag); background: transparent; }
 
-        /* --- REPORT VIEW STYLES --- */
-        #report-view { display: none; padding-bottom: 50px; color: #000; background: #fff; padding: 30px; border-radius: 8px; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; text-align: center; }
-        .stat-box { padding: 15px; border-radius: 8px; background: #f5f5f5; border: 1px solid #ddd; }
-        .stat-val { font-size: 1.5rem; font-weight: bold; display: block; }
-        .stat-label { font-size: 0.8rem; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .s-score { color: #333; }
-        .s-correct { color: #2e7d32; }
-        .s-wrong { color: #c62828; }
-        .s-left { color: #f57c00; }
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            #btn-menu { display: block; } /* Show menu button */
+            
+            .sidebar {
+                position: absolute; left: 0; top: 0; bottom: 0;
+                width: 85%; max-width: 300px;
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            }
+            .sidebar.open { transform: translateX(0); }
 
-        .report-card { background: #fff; padding: 15px; margin-bottom: 15px; border-bottom: 1px solid #eee; }
-        .report-q { font-weight: bold; margin-bottom: 8px; color: #222; font-size: 1rem; }
-        .report-ans { font-size: 0.9rem; margin-bottom: 5px; color: #444; }
-        .correct-ans { color: #2e7d32; font-weight: 600; }
-        .wrong-ans { color: #c62828; font-weight: 600; }
-        .report-hint { font-size: 0.85rem; color: #666; margin-top: 8px; font-style: italic; background: #f9f9f9; padding: 8px; border-left: 3px solid #8ab4f8; }
+            /* Overlay when sidebar open */
+            .sidebar-backdrop {
+                position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+                z-index: 40; display: none;
+            }
+            .sidebar-backdrop.active { display: block; }
 
-        /* Start Overlay */
-        
-        #overlay {
-            position: fixed; inset: 0; background: var(--bg-primary); z-index: 999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            .main-content { padding: 20px 15px; }
+            .question-text { font-size: 1.1rem; }
+            .option { padding: 14px; font-size: 0.95rem; }
+            
+            /* Stack controls on very small screens */
+            .controls { gap: 15px; } 
+            
+            /* Start Screen Mobile */
+            #overlay h1 { font-size: 1.8rem !important; }
+            .mode-select { flex-direction: column; width: 100%; max-width: 250px; }
+            .mode-select button { width: 100%; justify-content: center; }
         }
+
+        /* --- OVERLAYS --- */
+        #start-screen {
+            position: fixed; inset: 0; background: var(--bg-primary); z-index: 999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;
+        }
+        
+        #report-view { display: none; background: #fff; color: #000; padding: 20px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-box { background: #f1f3f4; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-val { font-size: 1.5rem; font-weight: bold; }
+        .stat-lbl { font-size: 0.75rem; text-transform: uppercase; color: #5f6368; }
+        .s-score { color: #202124; }
+        .s-correct { color: #188038; }
+        .s-wrong { color: #d93025; }
+        
+        .rep-item { border-bottom: 1px solid #dadce0; padding: 15px 0; }
+        .rep-q { font-weight: 700; margin-bottom: 8px; }
+        .rep-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px; }
+        .rep-hint { background: #e8f0fe; color: #1967d2; padding: 8px; border-radius: 4px; font-size: 0.85rem; margin-top: 8px; }
+
     </style>
 </head>
-<!-- ===================== This commes on the first page, QUIZ and EXAM Mode Options ===================== -->
 <body>
-<div id="overlay">
-    <h1 style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;">PHYSICS NCERT Quiz</h1> 
-    <p style="color: var(--text-dim); margin-bottom: 40px;">Kinetic Theory of Gases</p>
+
+<div class="sidebar-backdrop" id="backdrop" onclick="toggleSidebar()"></div>
+
+<div id="start-screen">
+    <h1 style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;">Kinetic Theory</h1>
+    <p style="color: var(--text-dim); margin-bottom: 40px;">Quiz 4: Mean Free Path & Summary</p>
     
-    <div style="display: flex; gap: 20px;">
-        <div class="tooltip-wrap" data-tip="Instant feedback. See hints immediately.">
-            <button class="btn-primary" id="btn-practice">Practice Mode</button>
-        </div>
-        <div class="tooltip-wrap" data-tip="Simulation. Results shown at end.">
-            <button class="btn-secondary" id="btn-exam">Exam Mode</button>
-        </div>
+    <div class="mode-select" style="display: flex; gap: 15px;">
+        <button class="btn-primary" onclick="startQuiz('practice')">Practice Mode</button>
+        <button class="btn-secondary" onclick="startQuiz('exam')">Exam Mode</button>
     </div>
+    <p style="margin-top:20px; font-size: 0.8rem; color: var(--border);">Mobile Optimized Version</p>
 </div>
-<!-- ===================== This is what is written on each Question Page, top left heading ===================== -->
+
 <header>
-    <h1 class="quiz-title">Physics: Chapter 12</h1>
-    <button class="btn-primary" id="btn-download" style="display:none;" onclick="downloadPDF()">Download PDF</button>
+    <div class="header-left">
+        <button id="btn-menu" onclick="toggleSidebar()">☰</button>
+        <h1 class="quiz-title">Quiz 4: Final Review</h1>
+    </div>
+    <button class="btn-secondary" id="btn-pdf" style="display:none; padding: 6px 12px; font-size: 0.8rem;" onclick="downloadPDF()">Save PDF</button>
 </header>
 
 <div class="layout">
-    <div class="sidebar" id="sidebar" style="display:none;">
+    <div class="sidebar" id="sidebar">
+        <div class="palette-header">Question Palette</div>
         <div class="palette-grid" id="p-grid"></div>
-        <button class="btn-secondary" style="width: 100%; margin-top: auto; border-radius: 8px;" id="btn-finish">Submit Quiz</button>
+        <button class="btn-secondary" style="width: 100%; margin-top: auto; border-radius: 8px; justify-content: center;" onclick="showReport()">Submit Quiz</button>
     </div>
 
     <div class="main-content">
-        <div id="quiz-view" class="question-container" style="display:none;">
+        <div id="quiz-view" class="question-container">
             <div id="q-section" class="section-label"></div>
             <div id="q-text" class="question-text"></div>
             <div id="q-options"></div>
             
             <div id="feedback" class="feedback-card">
-                <span id="cite-ref" class="cite-tag"></span>
-                <div id="hint-content"></div>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 5px;">NCERT Reference: <span id="cite-ref"></span></div>
+                <div id="hint-content" style="color: var(--text-main); font-size: 0.95rem;"></div>
             </div>
 
             <div class="controls">
                 <button class="btn-flag" onclick="toggleFlag()">⚑ Flag</button>
-                <div>
-                    <button class="btn-secondary" onclick="nav(-1)">Previous</button>
-                    <button class="btn-primary" style="margin-left: 10px;" onclick="nav(1)">Next</button>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-secondary" onclick="nav(-1)">Prev</button>
+                    <button class="btn-primary" onclick="nav(1)">Next</button>
                 </div>
             </div>
         </div>
@@ -256,55 +255,56 @@
 </div>
 
 <script>
-    /* =================================================================
-       6. DATA ARRAY: UPDATED WITH SECTION NUMBERS
-       =================================================================
-       r: Now uses "Sec X.Y" instead of "Page Z"
+    /* DATA FOR QUIZ 4: Mean Free Path, Summary, Points to Ponder
+       Note: Math is using double-escaped LaTeX (\\)
     */
     const data = [
-        { s: "12.5 Equipartition", q: "For a molecule free to move in space, how many coordinates are needed to specify its location?", o: ["One", "Two", "Three", "Four"], a: 2, r: "Sec 12.5", h: "Motion of a body as a whole in space needs three coordinates." },
-        { s: "12.5 Equipartition", q: "In thermal equilibrium, the average energy associated with each translational degree of freedom is:", o: ["$k_B T$", "$\\frac{1}{2} k_B T$", "$\\frac{3}{2} k_B T$", "Zero"], a: 1, r: "Sec 12.5", h: "Each translational term contributes $\\frac{1}{2} k_B T$." },
-        { s: "12.5 Equipartition", q: "A diatomic molecule like $O_2$ (rigid rotator) has how many rotational degrees of freedom?", o: ["One", "Two", "Three", "Zero"], a: 1, r: "Sec 12.5", h: "It can rotate about two independent axes normal to the interatomic axis." },
-        { s: "12.5 Equipartition", q: "Why is rotation along the line joining the atoms in a diatomic molecule typically ignored?", o: ["Zero mass", "Very small moment of inertia", "No rotation", "Gravity"], a: 1, r: "Sec 12.5", h: "Rotation along this axis has a very small moment of inertia." },
-        { s: "12.5 Equipartition", q: "A single vibrational mode contributes how many 'squared terms' to the total energy?", o: ["One", "Two", "Three", "None"], a: 1, r: "Sec 12.5", h: "One vibrational mode contributes both kinetic and potential energy terms." },
-        { s: "12.5 Equipartition", q: "The law of equipartition states that in equilibrium, each energy mode has an average energy of:", o: ["$k_B T$", "$\\frac{1}{2} k_B T$", "$\\frac{3}{2} k_B T$", "$RT$"], a: 1, r: "Sec 12.5", h: "Each mode gets $\\frac{1}{2} k_B T$." },
-        { s: "12.5 Equipartition", q: "While translational degrees contribute $\\frac{1}{2} k_B T$, each vibrational frequency contributes:", o: ["$\\frac{1}{2} k_B T$", "$k_B T$", "$\\frac{3}{2} k_B T$", "Zero"], a: 1, r: "Sec 12.5", h: "Vibration has 2 modes (kinetic+potential), so $2 \\times \\frac{1}{2} k_B T = k_B T$." },
-        { s: "12.6 Specific Heat", q: "For a monatomic gas, the molar specific heat at constant volume ($C_v$) is predicted to be:", o: ["$\\frac{1}{2} R$", "$R$", "$\\frac{3}{2} R$", "$\\frac{5}{2} R$"], a: 2, r: "Sec 12.6.1", h: "$C_v = dU/dT = \\frac{3}{2} R$." },
-        { s: "12.6 Specific Heat", q: "The relation $C_p - C_v = R$ is true for which types of ideal gases?", o: ["Only Monatomic", "Only Diatomic", "Only Polyatomic", "Any ideal gas"], a: 3, r: "Sec 12.6.1", h: "This relation holds true for any ideal gas." },
-        { s: "12.6 Specific Heat", q: "For a rigid diatomic gas, the predicted ratio of specific heats $\\gamma$ is:", o: ["5/3", "7/5", "9/7", "1.33"], a: 1, r: "Sec 12.6.2", h: "$C_p = \\frac{7}{2} R, C_v = \\frac{5}{2} R$." },
-        { s: "12.6 Specific Heat", q: "If a diatomic molecule has one vibrational mode in addition to translation and rotation, its $C_v$ is:", o: ["$\\frac{3}{2} R$", "$\\frac{5}{2} R$", "$\\frac{7}{2} R$", "$\\frac{9}{2} R$"], a: 2, r: "Sec 12.6.2", h: "Vibration adds $R$ to the rigid value ($\\frac{5}{2} R + R = \\frac{7}{2} R$)." },
-        { s: "12.6 Specific Heat", q: "A polyatomic molecule with 'f' vibrational modes is predicted to have $\\gamma$ equal to:", o: ["$\\frac{3+f}{4+f}$", "$\\frac{4+f}{3+f}$", "$\\frac{5+f}{3+f}$", "$\\frac{3}{2}$"], a: 1, r: "Sec 12.6.3", h: "Formula: $\\gamma = (4+f)/(3+f)$." },
-        { s: "12.6 Specific Heat", q: "Experimental specific heats for polyatomic gases are often higher than predicted because:", o: ["Non-ideal behavior", "Active vibrational modes", "Mass differences", "High Pressure"], a: 1, r: "Sec 12.6.3", h: "Agreement improves by including vibrational modes." },
-        { s: "12.6 Specific Heat", q: "An atom in a solid vibrating in 3D has an average energy of:", o: ["$\\frac{1}{2} k_B T$", "$\\frac{3}{2} k_B T$", "$3 k_B T$", "Zero"], a: 2, r: "Sec 12.6.4", h: "3D oscillation means 3 modes $\\times k_B T$." },
-        { s: "12.6 Specific Heat", q: "The predicted molar specific heat $C$ for most solids at room temperature is:", o: ["$R$", "$\\frac{3}{2} R$", "$3R$", "$6R$"], a: 2, r: "Sec 12.6.4", h: "$U = 3RT$, so $C = 3R$." },
-        { s: "12.6 Specific Heat", q: "Which element is an exception to the $C = 3R$ rule at room temperature?", o: ["Aluminium", "Copper", "Carbon", "Lead"], a: 2, r: "Sec 12.6.4", h: "Carbon has a significantly lower value ($6.1$ vs $24.9$)." },
-        { s: "12.6 Specific Heat", q: "In solids, why is $\\Delta Q \\approx \\Delta U$?", o: ["P is zero", "Volume change is negligible", "Energy constant", "It is liquid"], a: 1, r: "Sec 12.6.4", h: "Solids have negligible $\\Delta V$, so work $P\\Delta V$ is negligible." },
-        { s: "12.6 Specific Heat", q: "Equipartition of energy is a principle of:", o: ["Quantum mechanics", "Classical statistical mechanics", "Relativity", "Fluid dynamics"], a: 1, r: "Sec 12.5", h: "First proved by Maxwell using classical statistical mechanics." },
-        { s: "12.6 Specific Heat", q: "The 'rigid rotator' assumption for $O_2$ is valid at:", o: ["All Temps", "Moderate Temps", "Absolute Zero", "High Pressures"], a: 1, r: "Sec 12.6.2", h: "Valid at moderate temperatures." },
-        { s: "12.6 Specific Heat", q: "Which molecule has active vibrational modes even at moderate temperatures?", o: ["$O_2$", "$N_2$", "CO", "Argon"], a: 2, r: "Sec 12.6.2", h: "CO contributes vibrational energy even at moderate T." }
+        { s: "12.7 Mean Free Path", q: "Why do gas molecules moving at hundreds of meters per second take a long time to diffuse across a room?", o: ["They are heavy", "They collide incessantly", "Gravity slows them", "They are magnetic"], a: 1, r: "Sec 12.7", h: "Collisions change their direction randomly, so the net path is small." },
+        { s: "12.7 Mean Free Path", q: "The mean free path $l$ is inversely proportional to:", o: ["Temperature $T$", "Number density $n$", "Volume $V$", "Mass $m$"], a: 1, r: "Sec 12.7", h: "Formula: $l = 1 / (\\sqrt{2} n \\pi d^2)$. It depends on $n$ and diameter $d$." },
+        { s: "12.7 Mean Free Path", q: "If the diameter of a gas molecule is doubled, the mean free path will:", o: ["Double", "Halve", "Decrease by 4 times", "Stay same"], a: 2, r: "Sec 12.7", h: "$l \\propto 1/d^2$. If $d$ becomes $2d$, $l$ becomes $1/4$." },
+        { s: "12.7 Mean Free Path", q: "Although the mean free path is small, the 'Collision Frequency' is:", o: ["Very small", "Zero", "Very high", "Negative"], a: 2, r: "Sec 12.7", h: "Molecules travel fast but hit often (billions of times per second)." },
+        { s: "12.7 Mean Free Path", q: "The mean free path depends on the size of the molecule. We treat molecules as:", o: ["Points", "Spheres of diameter $d$", "Cubes", "Waves"], a: 1, r: "Sec 12.7", h: "The derivation assumes molecules are spheres of diameter $d$." },
+        { s: "Summary", q: "An ideal gas is one where intermolecular forces are:", o: ["Strong", "Repulsive", "Absent", "Magnetic"], a: 2, r: "Summary Pt 1", h: "Ideal gases are defined by the absence of intermolecular forces." },
+        { s: "Summary", q: "Internal energy of an ideal gas depends only on:", o: ["Pressure", "Volume", "Temperature", "Density"], a: 2, r: "Summary Pt 2", h: "For ideal gases, internal energy is a function of T only." },
+        { s: "Summary", q: "At absolute zero temperature, the kinetic energy of an ideal gas molecules is:", o: ["Maximum", "Zero", "Infinite", "Constant"], a: 1, r: "Summary Pt 3", h: "$E \\propto T$. If $T=0$, Kinetic Energy is zero." },
+        { s: "Summary", q: "Which law states that equal volumes of gases at same P and T contain equal number of molecules?", o: ["Boyle's", "Charles'", "Avogadro's", "Dalton's"], a: 2, r: "Summary Pt 4", h: "This is Avogadro's Hypothesis." },
+        { s: "Summary", q: "The pressure of a gas is the result of:", o: ["Static repulsion", "Momentum transfer to walls", "Gravitational weight", "Friction"], a: 1, r: "Summary Pt 5", h: "Collisions with the wall transfer momentum, creating force/area." },
+        { s: "Summary", q: "Which energy mode is NOT excited at ordinary temperatures for rigid diatomic molecules?", o: ["Translation", "Rotation", "Vibration", "None"], a: 2, r: "Summary Pt 7", h: "Vibrational modes usually require high temperatures." },
+        { s: "Points to Ponder", q: "Is the pressure of a gas equal to the force exerted by molecules on the wall?", o: ["Yes", "No, it is Force/Area", "No, it is Force x Area", "No, it is Momentum"], a: 1, r: "PTP 1", h: "Pressure is Force per unit Area, not just Force." },
+        { s: "Points to Ponder", q: "Though collisions are random, why does a gas in equilibrium have uniform density?", o: ["Gravity", "Law of large numbers", "Electric forces", "It is a solid"], a: 1, r: "PTP 2", h: "With $10^{23}$ particles, fluctuations cancel out (Statistics)." },
+        { s: "Points to Ponder", q: "In the ideal gas model, the volume of the molecules themselves is assumed to be:", o: ["Equal to container", "Negligible", "Half the container", "Variable"], a: 1, r: "PTP 3", h: "Molecules are points; their own volume is neglected." },
+        { s: "Points to Ponder", q: "The temperature of a gas is a measure of:", o: ["Total Energy", "Average KE per molecule", "Maximum KE", "Potential Energy"], a: 1, r: "PTP 4", h: "Temperature relates to the average kinetic energy." },
+        { s: "Points to Ponder", q: "Is it possible for a gas to have temperature if it consists of just one molecule?", o: ["Yes", "No", "Only if moving", "Only if stopped"], a: 1, r: "PTP 4", h: "Temperature is a statistical concept meaningful only for large collections." },
+        { s: "Points to Ponder", q: "When a gas expands into a vacuum (free expansion), its temperature:", o: ["Increases", "Decreases", "Remains constant", "Becomes zero"], a: 2, r: "PTP 5", h: "No work is done and no heat is exchanged, so internal energy (and T) stays constant." },
+        { s: "Points to Ponder", q: "The formula $P = 1/3 nm \\overline{v^2}$ is valid for:", o: ["Only Monoatomic", "Only Diatomic", "Any Ideal Gas", "Only Solids"], a: 2, r: "PTP 6", h: "It is valid regardless of the internal structure (rotation/vibration)." },
+        { s: "Points to Ponder", q: "The mean free path increases if the density of the gas:", o: ["Increases", "Decreases", "Stays same", "Becomes infinite"], a: 1, r: "Sec 12.7", h: "Lower density means fewer obstacles, so path length increases." },
+        { s: "Points to Ponder", q: "Which speed is generally larger in a gas distribution?", o: ["Most Probable", "Average", "RMS", "Zero"], a: 2, r: "PTP 6", h: "$v_{rms} > v_{avg} > v_{mp}$." }
     ];
 
-    /* ================================================================= */
-    /* 7. APP LOGIC                                                      */
-    /* ================================================================= */
-
-    // --- State Variables ---
     let current = 0;
     let mode = 'practice';
     let answers = new Array(data.length).fill(null);
     let flagged = new Array(data.length).fill(false);
+    let sidebarOpen = false;
 
-    // --- Event Listeners ---
-    document.getElementById('btn-practice').onclick = () => startQuiz('practice');
-    document.getElementById('btn-exam').onclick = () => startQuiz('exam');
-    document.getElementById('btn-finish').onclick = showReport;
+    // --- Sidebar Logic ---
+    function toggleSidebar() {
+        sidebarOpen = !sidebarOpen;
+        const sb = document.getElementById('sidebar');
+        const bd = document.getElementById('backdrop');
+        if (sidebarOpen) {
+            sb.classList.add('open');
+            bd.classList.add('active');
+        } else {
+            sb.classList.remove('open');
+            bd.classList.remove('active');
+        }
+    }
 
-    // --- Logic Functions ---
+    // --- Quiz Logic ---
     function startQuiz(m) {
         mode = m;
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('sidebar').style.display = 'flex';
-        document.getElementById('quiz-view').style.display = 'block';
+        document.getElementById('start-screen').style.display = 'none';
         renderPalette();
         renderQ();
     }
@@ -316,7 +316,12 @@
             const btn = document.createElement('div');
             btn.className = `p-item ${i===current ? 'current' : ''} ${answers[i]!==null ? 'attempted' : ''} ${flagged[i] ? 'flagged' : ''}`;
             btn.innerText = i + 1;
-            btn.onclick = () => { current = i; renderQ(); renderPalette(); };
+            btn.onclick = () => { 
+                current = i; 
+                renderQ(); 
+                renderPalette();
+                if(window.innerWidth <= 768) toggleSidebar(); // Close on click mobile
+            };
             grid.appendChild(btn);
         });
     }
@@ -352,7 +357,7 @@
         const fb = document.getElementById('feedback');
         if (mode === 'practice' && answers[current] !== null) {
             fb.style.display = 'block';
-            document.getElementById('cite-ref').innerText = "NCERT Ref: " + item.r;
+            document.getElementById('cite-ref').innerText = item.r;
             document.getElementById('hint-content').innerText = item.h;
         } else {
             fb.style.display = 'none';
@@ -383,63 +388,57 @@
     }
 
     function showReport() {
-        if (!confirm("Submit Quiz and View Report?")) return;
-
-        document.getElementById('sidebar').style.display = 'none';
-        document.getElementById('quiz-view').style.display = 'none';
-        document.getElementById('btn-download').style.display = 'block';
-        document.body.style.overflow = 'auto'; // Enable scrolling for report
-
+        if (!confirm("Submit Quiz?")) return;
+        
+        // Hide UI, Show Report
+        document.querySelector('.layout').style.display = 'none';
+        document.querySelector('header').style.display = 'none'; // Hide main header
+        document.getElementById('btn-pdf').style.display = 'block'; // Logic handled inside report
+        
+        // Build Report Header with PDF Button
         const reportDiv = document.getElementById('report-view');
         reportDiv.style.display = 'block';
-        
-        let score = 0, unanswered = 0, wrong = 0;
-        let htmlList = '';
+        document.body.style.overflow = 'auto';
+
+        let score = 0, wrong = 0, left = 0;
+        let detailsHtml = '';
 
         data.forEach((item, i) => {
-            const userAns = answers[i];
-            
-            if (userAns === null) {
-                unanswered++;
-            } else if (userAns === item.a) {
-                score++;
-            } else {
-                wrong++;
-            }
+            const u = answers[i];
+            if(u === null) left++;
+            else if(u === item.a) score++;
+            else wrong++;
 
-            const userAnsText = (userAns !== null) ? item.o[userAns] : 'Unanswered';
-            let statusHTML = '';
+            const colorClass = (u === item.a) ? 's-correct' : (u===null ? '' : 's-wrong');
+            const uText = (u !== null) ? item.o[u] : 'Unanswered';
             
-            if (userAns === item.a) {
-                statusHTML = `<div class="report-ans">Your Answer: <span class="correct-ans">${userAnsText}</span></div>`;
-            } else {
-                statusHTML = `<div class="report-ans">Your Answer: <span class="wrong-ans">${userAnsText}</span></div>
-                              <div class="report-ans correct-ans">Correct Answer: ${item.o[item.a]}</div>`;
-            }
-
-            htmlList += `
-            <div class="report-card">
-                <div class="report-q">Q${i+1}: ${item.q}</div>
-                ${statusHTML}
-                <div class="report-hint"><strong>Hint:</strong> ${item.h} (Ref: ${item.r})</div>
+            detailsHtml += `
+            <div class="rep-item">
+                <div class="rep-q">Q${i+1}: ${item.q}</div>
+                <div class="rep-row"><span>Your Answer:</span> <strong style="color:${u === item.a ? '#188038' : '#d93025'}">${uText}</strong></div>
+                ${u !== item.a ? `<div class="rep-row"><span>Correct:</span> <strong>${item.o[item.a]}</strong></div>` : ''}
+                <div class="rep-hint">Hint: ${item.h} (${item.r})</div>
             </div>`;
         });
 
-        const percentage = Math.round((score / data.length) * 100);
-
-        const statsHTML = `
-            <h2 style="text-align:center; margin-bottom:20px; color:#333;">Final Performance Report</h2>
-            <div class="stats-grid">
-                <div class="stat-box"><span class="stat-val s-score">${percentage}%</span><span class="stat-label">Score</span></div>
-                <div class="stat-box"><span class="stat-val s-correct">${score}</span><span class="stat-label">Correct</span></div>
-                <div class="stat-box"><span class="stat-val s-wrong">${wrong}</span><span class="stat-label">Incorrect</span></div>
-                <div class="stat-box"><span class="stat-val s-left">${unanswered}</span><span class="stat-label">Left</span></div>
+        const pct = Math.round((score / data.length) * 100);
+        
+        reportDiv.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2>Results</h2>
+                <button class="btn-primary" onclick="downloadPDF()">Download PDF</button>
             </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box"><div class="stat-val s-score">${pct}%</div><div class="stat-lbl">Score</div></div>
+                <div class="stat-box"><div class="stat-val s-correct">${score}</div><div class="stat-lbl">Correct</div></div>
+                <div class="stat-box"><div class="stat-val s-wrong">${wrong}</div><div class="stat-lbl">Wrong</div></div>
+                <div class="stat-box"><div class="stat-val">${left}</div><div class="stat-lbl">Left</div></div>
+            </div>
+            <div>${detailsHtml}</div>
         `;
-
-        reportDiv.innerHTML = statsHTML + htmlList;
-
-        if (window.MathJax) MathJax.typesetPromise();
+        
+        if(window.MathJax) MathJax.typesetPromise();
     }
 
     function downloadPDF() {
