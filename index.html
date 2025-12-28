@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NCERT Quiz - Mobile Ready</title>
+    
+    <title>NCERT Quiz Template - Mobile Optimized</title>
     
     <script>
         window.MathJax = {
@@ -15,7 +16,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- THEME --- */
+        /* ================================================================= */
+        /* 3. CSS STYLES                                                     */
+        /* ================================================================= */
         :root {
             --bg-primary: #131314;       
             --bg-secondary: #1e1f20;     
@@ -53,22 +56,20 @@
             align-items: center;
             justify-content: space-between;
             height: 60px;
+            z-index: 10;
         }
-
-        .header-left { display: flex; align-items: center; gap: 15px; }
         
         .quiz-title { font-size: 1.1rem; color: var(--accent); margin: 0; font-weight: 500; }
-        
-        /* Mobile Menu Button */
-        #btn-menu {
-            background: transparent; border: none; color: var(--text-main);
-            font-size: 1.5rem; cursor: pointer; display: none; padding: 5px;
+
+        /* --- LAYOUT CONTAINER --- */
+        .layout { 
+            display: flex; 
+            flex: 1; 
+            overflow: hidden; 
+            position: relative; 
         }
 
-        /* --- LAYOUT --- */
-        .layout { display: flex; flex: 1; overflow: hidden; position: relative; }
-
-        /* Sidebar (Desktop Default) */
+        /* --- SIDEBAR (QUESTION PALETTE) --- */
         .sidebar {
             width: 260px;
             background: var(--bg-secondary);
@@ -78,7 +79,6 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
-            z-index: 50;
         }
 
         .palette-header { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
@@ -89,12 +89,11 @@
             gap: 8px;
         }
 
-        /* --- BUTTON SHAPE: Change border-radius here --- */
         .p-item {
             aspect-ratio: 1;
             display: flex; align-items: center; justify-content: center;
             border: 1px solid var(--border);
-            border-radius: 8px; /* Change to 50% for circles */
+            border-radius: 8px; 
             cursor: pointer; font-size: 0.9rem; color: var(--text-dim);
             transition: 0.2s;
         }
@@ -103,7 +102,7 @@
         .p-item.attempted { background: var(--success); color: white; border-color: var(--success); }
         .p-item.flagged { background: var(--flag); color: black; border-color: var(--flag); }
 
-        /* Main Content */
+        /* --- MAIN CONTENT (QUESTION AREA) --- */
         .main-content {
             flex: 1;
             padding: 30px;
@@ -111,11 +110,11 @@
             display: flex; flex-direction: column;
         }
 
-        .question-container { max-width: 800px; margin: 0 auto; width: 100%; padding-bottom: 80px; }
+        .question-container { max-width: 800px; margin: 0 auto; width: 100%; padding-bottom: 20px; }
 
         .section-label { color: var(--accent); font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; font-weight: bold; display: inline-block; background: rgba(138, 180, 248, 0.1); padding: 4px 8px; border-radius: 4px; }
         
-        .question-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; overflow-x: auto; }
+        .question-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; }
 
         .option {
             background: var(--bg-secondary);
@@ -145,37 +144,39 @@
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
         .btn-flag { color: var(--flag); border: 1px solid var(--flag); background: transparent; }
 
-        /* --- MOBILE RESPONSIVENESS --- */
+        /* --- MOBILE RESPONSIVENESS (The Magic) --- */
         @media (max-width: 768px) {
-            #btn-menu { display: block; } /* Show menu button */
-            
+            /* 1. Stack Layout Vertically */
+            .layout { flex-direction: column; }
+
+            /* 2. Main Content (Question) goes First */
+            .main-content {
+                order: 1;
+                width: 100%;
+                flex: 1; /* Takes available space */
+                padding: 20px;
+                border-bottom: 1px solid var(--border);
+            }
+
+            /* 3. Sidebar (Palette) goes Second (Bottom) */
             .sidebar {
-                position: absolute; left: 0; top: 0; bottom: 0;
-                width: 85%; max-width: 300px;
-                transform: translateX(-100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+                order: 2;
+                width: 100%;
+                height: auto;
+                max-height: 250px; /* Limit height so it doesn't take over */
+                border-right: none;
+                border-top: 1px solid var(--border);
+                flex-shrink: 0;
             }
-            .sidebar.open { transform: translateX(0); }
 
-            /* Overlay when sidebar open */
-            .sidebar-backdrop {
-                position: absolute; inset: 0; background: rgba(0,0,0,0.6);
-                z-index: 40; display: none;
-            }
-            .sidebar-backdrop.active { display: block; }
-
-            .main-content { padding: 20px 15px; }
+            /* Adjust Palette Grid for Mobile width */
+            .palette-grid { grid-template-columns: repeat(6, 1fr); }
+            
             .question-text { font-size: 1.1rem; }
             .option { padding: 14px; font-size: 0.95rem; }
             
-            /* Stack controls on very small screens */
-            .controls { gap: 15px; } 
-            
-            /* Start Screen Mobile */
-            #overlay h1 { font-size: 1.8rem !important; }
-            .mode-select { flex-direction: column; width: 100%; max-width: 250px; }
-            .mode-select button { width: 100%; justify-content: center; }
+            /* Start Screen Mobile Adjustments */
+            #start-screen h1 { font-size: 1.8rem !important; }
         }
 
         /* --- OVERLAYS --- */
@@ -185,39 +186,45 @@
         }
         
         #report-view { display: none; background: #fff; color: #000; padding: 20px; }
+        /* Report Styles */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-box { background: #f1f3f4; padding: 15px; border-radius: 8px; text-align: center; }
         .stat-val { font-size: 1.5rem; font-weight: bold; }
         .stat-lbl { font-size: 0.75rem; text-transform: uppercase; color: #5f6368; }
-        .s-score { color: #202124; }
-        .s-correct { color: #188038; }
-        .s-wrong { color: #d93025; }
-        
+        .s-score { color: #202124; } .s-correct { color: #188038; } .s-wrong { color: #d93025; }
         .rep-item { border-bottom: 1px solid #dadce0; padding: 15px 0; }
         .rep-q { font-weight: 700; margin-bottom: 8px; }
         .rep-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px; }
         .rep-hint { background: #e8f0fe; color: #1967d2; padding: 8px; border-radius: 4px; font-size: 0.85rem; margin-top: 8px; }
-
+        
+        /* Tooltip Styles */
+        .tooltip-wrap { position: relative; display: inline-block; }
+        .tooltip-wrap::after {
+            content: attr(data-tip); position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);
+            width: 160px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px;
+            font-size: 0.75rem; opacity: 0; visibility: hidden; transition: 0.3s; pointer-events: none; z-index: 10;
+        }
+        .tooltip-wrap:hover::after { opacity: 1; visibility: visible; }
     </style>
 </head>
 <body>
-
-<div class="sidebar-backdrop" id="backdrop" onclick="toggleSidebar()"></div>
 
 <div id="start-screen">
     <h1 style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;">Kinetic Theory</h1>
     <p style="color: var(--text-dim); margin-bottom: 40px;">Quiz 4: Mean Free Path & Summary</p>
     
-    <div class="mode-select" style="display: flex; gap: 15px;">
-        <button class="btn-primary" onclick="startQuiz('practice')">Practice Mode</button>
-        <button class="btn-secondary" onclick="startQuiz('exam')">Exam Mode</button>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+        <div class="tooltip-wrap" data-tip="Instant feedback.">
+            <button class="btn-primary" onclick="startQuiz('practice')">Practice Mode</button>
+        </div>
+        <div class="tooltip-wrap" data-tip="Score at the end.">
+            <button class="btn-secondary" onclick="startQuiz('exam')">Exam Mode</button>
+        </div>
     </div>
-    <p style="margin-top:20px; font-size: 0.8rem; color: var(--border);">Mobile Optimized Version</p>
 </div>
 
 <header>
     <div class="header-left">
-        <button id="btn-menu" onclick="toggleSidebar()">☰</button>
         <h1 class="quiz-title">Quiz 4: Final Review</h1>
     </div>
     <button class="btn-secondary" id="btn-pdf" style="display:none; padding: 6px 12px; font-size: 0.8rem;" onclick="downloadPDF()">Save PDF</button>
@@ -225,9 +232,9 @@
 
 <div class="layout">
     <div class="sidebar" id="sidebar">
-        <div class="palette-header">Question Palette</div>
+        <div class="palette-header" style="padding-bottom: 5px;">Question Palette</div>
         <div class="palette-grid" id="p-grid"></div>
-        <button class="btn-secondary" style="width: 100%; margin-top: auto; border-radius: 8px; justify-content: center;" onclick="showReport()">Submit Quiz</button>
+        <button class="btn-secondary" style="width: 100%; margin-top: 15px; border-radius: 8px; justify-content: center;" onclick="showReport()">Submit Quiz</button>
     </div>
 
     <div class="main-content">
@@ -255,9 +262,9 @@
 </div>
 
 <script>
-    /* DATA FOR QUIZ 4: Mean Free Path, Summary, Points to Ponder
-       Note: Math is using double-escaped LaTeX (\\)
-    */
+    /* =================================================================
+       6. DATA ARRAY (Quiz 4 Content)
+       ================================================================= */
     const data = [
         { s: "12.7 Mean Free Path", q: "Why do gas molecules moving at hundreds of meters per second take a long time to diffuse across a room?", o: ["They are heavy", "They collide incessantly", "Gravity slows them", "They are magnetic"], a: 1, r: "Sec 12.7", h: "Collisions change their direction randomly, so the net path is small." },
         { s: "12.7 Mean Free Path", q: "The mean free path $l$ is inversely proportional to:", o: ["Temperature $T$", "Number density $n$", "Volume $V$", "Mass $m$"], a: 1, r: "Sec 12.7", h: "Formula: $l = 1 / (\\sqrt{2} n \\pi d^2)$. It depends on $n$ and diameter $d$." },
@@ -281,27 +288,14 @@
         { s: "Points to Ponder", q: "Which speed is generally larger in a gas distribution?", o: ["Most Probable", "Average", "RMS", "Zero"], a: 2, r: "PTP 6", h: "$v_{rms} > v_{avg} > v_{mp}$." }
     ];
 
+    /* =================================================================
+       7. APP LOGIC
+       ================================================================= */
     let current = 0;
     let mode = 'practice';
     let answers = new Array(data.length).fill(null);
     let flagged = new Array(data.length).fill(false);
-    let sidebarOpen = false;
 
-    // --- Sidebar Logic ---
-    function toggleSidebar() {
-        sidebarOpen = !sidebarOpen;
-        const sb = document.getElementById('sidebar');
-        const bd = document.getElementById('backdrop');
-        if (sidebarOpen) {
-            sb.classList.add('open');
-            bd.classList.add('active');
-        } else {
-            sb.classList.remove('open');
-            bd.classList.remove('active');
-        }
-    }
-
-    // --- Quiz Logic ---
     function startQuiz(m) {
         mode = m;
         document.getElementById('start-screen').style.display = 'none';
@@ -320,7 +314,6 @@
                 current = i; 
                 renderQ(); 
                 renderPalette();
-                if(window.innerWidth <= 768) toggleSidebar(); // Close on click mobile
             };
             grid.appendChild(btn);
         });
@@ -390,15 +383,15 @@
     function showReport() {
         if (!confirm("Submit Quiz?")) return;
         
-        // Hide UI, Show Report
+        // Hide Main UI
         document.querySelector('.layout').style.display = 'none';
-        document.querySelector('header').style.display = 'none'; // Hide main header
-        document.getElementById('btn-pdf').style.display = 'block'; // Logic handled inside report
+        document.querySelector('header').style.display = 'none'; 
+        document.getElementById('btn-pdf').style.display = 'block';
         
-        // Build Report Header with PDF Button
+        // Show Report
         const reportDiv = document.getElementById('report-view');
         reportDiv.style.display = 'block';
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = 'auto'; // allow scroll
 
         let score = 0, wrong = 0, left = 0;
         let detailsHtml = '';
@@ -409,7 +402,6 @@
             else if(u === item.a) score++;
             else wrong++;
 
-            const colorClass = (u === item.a) ? 's-correct' : (u===null ? '' : 's-wrong');
             const uText = (u !== null) ? item.o[u] : 'Unanswered';
             
             detailsHtml += `
@@ -445,7 +437,7 @@
         const element = document.getElementById('report-view');
         const opt = {
             margin: 10,
-            filename: 'KTG_Quiz_Report.pdf',
+            filename: 'Quiz_Report.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
