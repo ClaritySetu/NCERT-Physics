@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NCERT Quiz Template - Layout Fixed</title>
+    <title>NCERT Quiz - Final Fixed</title>
     
     <script>
         window.MathJax = {
@@ -15,6 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
+        /* 2. CSS VARIABLES */
         :root {
             --bg-primary: #131314;       
             --bg-secondary: #1e1f20;     
@@ -37,14 +38,14 @@
             margin: 0;
             display: flex;
             flex-direction: column;
-            height: 100vh; /* Full viewport height */
-            overflow: hidden; /* Prevent body scroll */
+            height: 100vh;
+            overflow: hidden;
             user-select: none;
         }
 
         /* --- HEADER --- */
         header {
-            flex: 0 0 60px; /* Fixed height, no grow/shrink */
+            flex: 0 0 60px;
             padding: 0 20px;
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border);
@@ -56,15 +57,15 @@
         
         .quiz-title { font-size: 1.1rem; color: var(--accent); margin: 0; font-weight: 500; }
 
-        /* --- LAYOUT CONTAINER --- */
+        /* --- MAIN LAYOUT (Quiz Interface) --- */
         .layout { 
             display: flex; 
             flex: 1; 
-            overflow: hidden; /* Crucial: contains the scrollbars */
+            overflow: hidden; 
             position: relative; 
         }
 
-        /* --- SIDEBAR (QUESTION PALETTE) --- */
+        /* --- SIDEBAR (Palette) --- */
         .sidebar {
             width: 260px;
             background: var(--bg-secondary);
@@ -77,34 +78,36 @@
 
         .palette-header { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* SCROLL AREA FIX */
         .palette-scroll-area {
-            flex: 1;           /* Takes remaining space */
-            min-height: 0;     /* CRITICAL: Allows flex child to shrink below content size */
-            overflow-y: auto;  /* Scroll internally */
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
             margin-bottom: 10px;
+            padding-right: 5px;
         }
 
         .palette-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
-            padding-right: 5px; /* Prevent scrollbar overlap */
         }
 
+        /* BUTTON SHAPE: Leaf Style */
         .p-item {
             aspect-ratio: 1;
             display: flex; align-items: center; justify-content: center;
             border: 1px solid var(--border);
-            border-radius: 8px; 
+            /* This makes the Leaf Shape */
+            border-radius: 12px 0px 12px 0px; 
             cursor: pointer; font-size: 0.9rem; color: var(--text-dim);
             transition: 0.2s;
         }
+        .p-item:active { transform: scale(0.95); }
         .p-item.current { border-color: var(--accent); color: var(--accent); background: rgba(138, 180, 248, 0.1); border-width: 2px; font-weight: bold; }
         .p-item.attempted { background: var(--success); color: white; border-color: var(--success); }
         .p-item.flagged { background: var(--flag); color: black; border-color: var(--flag); }
 
-        /* --- MAIN CONTENT (QUESTION AREA) --- */
+        /* --- QUESTION AREA --- */
         .main-content {
             flex: 1;
             padding: 30px;
@@ -113,7 +116,9 @@
         }
 
         .question-container { max-width: 800px; margin: 0 auto; width: 100%; padding-bottom: 20px; }
+
         .section-label { color: var(--accent); font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; font-weight: bold; display: inline-block; background: rgba(138, 180, 248, 0.1); padding: 4px 8px; border-radius: 4px; }
+        
         .question-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; }
 
         .option {
@@ -130,6 +135,7 @@
         .option.selected { border-color: var(--accent); background: rgba(138, 180, 248, 0.1); }
         .option.correct { background: rgba(52, 168, 83, 0.25) !important; border-color: var(--success) !important; }
         .option.wrong { background: rgba(234, 67, 53, 0.25) !important; border-color: var(--error) !important; }
+        .option.disabled { pointer-events: none; }
 
         .feedback-card { display: none; margin-top: 20px; padding: 15px; background: #232425; border-left: 4px solid var(--accent); border-radius: 8px; }
         .controls { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; }
@@ -139,51 +145,55 @@
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
         .btn-flag { color: var(--flag); border: 1px solid var(--flag); background: transparent; }
 
+        /* --- REPORT VIEW (Full Screen Overlay) --- */
+        #report-view { 
+            display: none; 
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: #fff; color: #000; 
+            padding: 30px; 
+            overflow-y: auto; 
+            z-index: 20;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px; text-align: center; }
+        .stat-box { background: #f1f3f4; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .stat-val { font-size: 1.5rem; font-weight: bold; display: block; }
+        .stat-lbl { font-size: 0.75rem; text-transform: uppercase; color: #5f6368; }
+        
+        .s-score { color: #202124; } 
+        .s-correct { color: #188038; } 
+        .s-wrong { color: #d93025; }
+        .s-left { color: #f29900; }
+
+        .rep-item { border-bottom: 1px solid #dadce0; padding: 15px 0; }
+        .rep-q { font-weight: 700; margin-bottom: 8px; color: #202124; }
+        .rep-row { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 4px; }
+        .rep-hint { background: #e8f0fe; color: #1967d2; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-top: 10px; border-left: 4px solid #1967d2; }
+
         /* --- MOBILE RESPONSIVENESS --- */
         @media (max-width: 768px) {
             .layout { flex-direction: column; }
-
-            /* 1. Main Content takes remaining space at top */
+            
             .main-content {
-                order: 1;
-                width: 100%;
-                flex: 1; 
-                min-height: 0; /* Allows content to scroll properly */
-                padding: 20px;
-                border-bottom: 1px solid var(--border);
+                order: 1; width: 100%; flex: 1; min-height: 0; padding: 20px; border-bottom: 1px solid var(--border);
             }
-
-            /* 2. Sidebar is fixed height at bottom */
+            
             .sidebar {
-                order: 2;
-                width: 100%;
-                height: 35vh; /* Takes 35% of screen height */
-                min-height: 200px;
-                border-right: none;
-                border-top: 1px solid var(--border);
-                flex-shrink: 0;
-                padding-bottom: env(safe-area-inset-bottom); /* Fix for iPhone bar */
+                order: 2; width: 100%; height: 35vh; min-height: 200px; border-right: none; border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);
             }
-
-            /* 3. Submit Button Pinned at Bottom */
-            #btn-finish {
-                flex-shrink: 0; /* Do not shrink */
-                margin-top: auto; 
-            }
+            
+            #btn-finish { flex-shrink: 0; margin-top: auto; }
             
             .palette-grid { grid-template-columns: repeat(6, 1fr); }
             .question-text { font-size: 1.1rem; }
+            
+            /* Report Mobile */
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            #report-view { padding: 15px; }
         }
 
-        /* --- START/REPORT OVERLAYS (UNCHANGED) --- */
+        /* --- START SCREEN --- */
         #start-screen { position: fixed; inset: 0; background: var(--bg-primary); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        #report-view { display: none; background: #fff; color: #000; padding: 20px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-box { background: #f1f3f4; padding: 15px; border-radius: 8px; text-align: center; }
-        .stat-val { font-size: 1.5rem; font-weight: bold; }
-        .stat-lbl { font-size: 0.75rem; text-transform: uppercase; color: #5f6368; }
-        .s-score { color: #202124; } .s-correct { color: #188038; } .s-wrong { color: #d93025; }
-        .rep-item { border-bottom: 1px solid #dadce0; padding: 15px 0; }
         .tooltip-wrap { position: relative; display: inline-block; }
         .tooltip-wrap::after { content: attr(data-tip); position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); width: 160px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; font-size: 0.75rem; opacity: 0; visibility: hidden; transition: 0.3s; pointer-events: none; z-index: 10; }
         .tooltip-wrap:hover::after { opacity: 1; visibility: visible; }
@@ -193,7 +203,7 @@
 
 <div id="start-screen">
     <h1 style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;">Kinetic Theory</h1>
-    <p style="color: var(--text-dim); margin-bottom: 40px;">Quiz 4: Mean Free Path & Summary</p>
+    <p style="color: var(--text-dim); margin-bottom: 40px;">Quiz 4: Final Review</p>
     <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
         <div class="tooltip-wrap" data-tip="Instant feedback.">
             <button class="btn-primary" onclick="startQuiz('practice')">Practice Mode</button>
@@ -204,21 +214,18 @@
     </div>
 </div>
 
-<header>
+<header id="main-header">
     <div class="header-left">
-        <h1 class="quiz-title">Quiz 4: Final Review</h1>
+        <h1 class="quiz-title">Physics: Chapter 12</h1>
     </div>
-    <button class="btn-secondary" id="btn-pdf" style="display:none; padding: 6px 12px; font-size: 0.8rem;" onclick="downloadPDF()">Save PDF</button>
 </header>
 
-<div class="layout">
+<div class="layout" id="quiz-layout">
     <div class="sidebar" id="sidebar">
         <div class="palette-header" style="padding-bottom: 5px;">Question Palette</div>
-        
         <div class="palette-scroll-area">
             <div class="palette-grid" id="p-grid"></div>
         </div>
-        
         <button class="btn-secondary" id="btn-finish" style="width: 100%; border-radius: 8px; justify-content: center;" onclick="showReport()">Submit Quiz</button>
     </div>
 
@@ -241,15 +248,14 @@
                 </div>
             </div>
         </div>
-
-        <div id="report-view"></div>
     </div>
 </div>
 
+<div id="report-view">
+    </div>
+
 <script>
-    /* * DATA SECTION: (Mean Free Path & Summary)
-     * You can replace this array with your own questions.
-     */
+    /* 3. DATA ARRAY */
     const data = [
         { s: "12.7 Mean Free Path", q: "Why do gas molecules moving at hundreds of meters per second take a long time to diffuse across a room?", o: ["They are heavy", "They collide incessantly", "Gravity slows them", "They are magnetic"], a: 1, r: "Sec 12.7", h: "Collisions change their direction randomly, so the net path is small." },
         { s: "12.7 Mean Free Path", q: "The mean free path $l$ is inversely proportional to:", o: ["Temperature $T$", "Number density $n$", "Volume $V$", "Mass $m$"], a: 1, r: "Sec 12.7", h: "Formula: $l = 1 / (\\sqrt{2} n \\pi d^2)$. It depends on $n$ and diameter $d$." },
@@ -273,7 +279,7 @@
         { s: "Points to Ponder", q: "Which speed is generally larger in a gas distribution?", o: ["Most Probable", "Average", "RMS", "Zero"], a: 2, r: "PTP 6", h: "$v_{rms} > v_{avg} > v_{mp}$." }
     ];
 
-    /* APP LOGIC */
+    /* 4. APP LOGIC */
     let current = 0;
     let mode = 'practice';
     let answers = new Array(data.length).fill(null);
@@ -362,15 +368,14 @@
     function showReport() {
         if (!confirm("Submit Quiz?")) return;
         
-        // Hide Main UI
-        document.querySelector('.layout').style.display = 'none';
-        document.querySelector('header').style.display = 'none'; 
-        document.getElementById('btn-pdf').style.display = 'block';
+        // Hide Main Layout and Header
+        document.getElementById('quiz-layout').style.display = 'none';
+        document.getElementById('main-header').style.display = 'none';
         
-        // Show Report
+        // Show Report View
         const reportDiv = document.getElementById('report-view');
         reportDiv.style.display = 'block';
-        document.body.style.overflow = 'auto'; // Allow body scroll
+        document.body.style.overflow = 'auto'; // Enable scrolling
 
         let score = 0, wrong = 0, left = 0;
         let detailsHtml = '';
@@ -396,7 +401,7 @@
         
         reportDiv.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2>Results</h2>
+                <h2 style="margin:0;">Results</h2>
                 <button class="btn-primary" onclick="downloadPDF()">Download PDF</button>
             </div>
             
@@ -404,7 +409,7 @@
                 <div class="stat-box"><div class="stat-val s-score">${pct}%</div><div class="stat-lbl">Score</div></div>
                 <div class="stat-box"><div class="stat-val s-correct">${score}</div><div class="stat-lbl">Correct</div></div>
                 <div class="stat-box"><div class="stat-val s-wrong">${wrong}</div><div class="stat-lbl">Wrong</div></div>
-                <div class="stat-box"><div class="stat-val">${left}</div><div class="stat-lbl">Left</div></div>
+                <div class="stat-box"><div class="stat-val s-left">${left}</div><div class="stat-lbl">Left</div></div>
             </div>
             <div>${detailsHtml}</div>
         `;
