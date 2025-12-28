@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NCERT Quiz - Final Fixed</title>
+    <title>NCERT Quiz - Top Button</title>
     
     <script>
         window.MathJax = {
@@ -15,7 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* 2. CSS VARIABLES */
+        /* 2. CSS STYLES */
         :root {
             --bg-primary: #131314;       
             --bg-secondary: #1e1f20;     
@@ -43,10 +43,10 @@
             user-select: none;
         }
 
-        /* --- HEADER --- */
+        /* --- HEADER (With Submit Button) --- */
         header {
             flex: 0 0 60px;
-            padding: 0 20px;
+            padding: 0 15px;
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -55,9 +55,12 @@
             z-index: 10;
         }
         
-        .quiz-title { font-size: 1.1rem; color: var(--accent); margin: 0; font-weight: 500; }
+        .quiz-title { font-size: 1.1rem; color: var(--text-main); margin: 0; font-weight: 600; }
+        
+        /* The Top Right Action Area */
+        .header-actions { display: flex; gap: 10px; }
 
-        /* --- MAIN LAYOUT (Quiz Interface) --- */
+        /* --- LAYOUT --- */
         .layout { 
             display: flex; 
             flex: 1; 
@@ -65,7 +68,7 @@
             position: relative; 
         }
 
-        /* --- SIDEBAR (Palette) --- */
+        /* --- SIDEBAR (Palette Only) --- */
         .sidebar {
             width: 260px;
             background: var(--bg-secondary);
@@ -76,13 +79,11 @@
             flex-shrink: 0;
         }
 
-        .palette-header { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .palette-header { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
 
         .palette-scroll-area {
             flex: 1;
-            min-height: 0;
             overflow-y: auto;
-            margin-bottom: 10px;
             padding-right: 5px;
         }
 
@@ -92,22 +93,20 @@
             gap: 8px;
         }
 
-        /* BUTTON SHAPE: Leaf Style */
+        /* Leaf Shape Buttons */
         .p-item {
             aspect-ratio: 1;
             display: flex; align-items: center; justify-content: center;
             border: 1px solid var(--border);
-            /* This makes the Leaf Shape */
             border-radius: 12px 0px 12px 0px; 
             cursor: pointer; font-size: 0.9rem; color: var(--text-dim);
             transition: 0.2s;
         }
-        .p-item:active { transform: scale(0.95); }
         .p-item.current { border-color: var(--accent); color: var(--accent); background: rgba(138, 180, 248, 0.1); border-width: 2px; font-weight: bold; }
         .p-item.attempted { background: var(--success); color: white; border-color: var(--success); }
         .p-item.flagged { background: var(--flag); color: black; border-color: var(--flag); }
 
-        /* --- QUESTION AREA --- */
+        /* --- MAIN CONTENT --- */
         .main-content {
             flex: 1;
             padding: 30px;
@@ -116,9 +115,7 @@
         }
 
         .question-container { max-width: 800px; margin: 0 auto; width: 100%; padding-bottom: 20px; }
-
         .section-label { color: var(--accent); font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; font-weight: bold; display: inline-block; background: rgba(138, 180, 248, 0.1); padding: 4px 8px; border-radius: 4px; }
-        
         .question-text { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; }
 
         .option {
@@ -132,39 +129,41 @@
             transition: background 0.2s;
             display: flex; align-items: center;
         }
+        .option:active { background: var(--item-hover); }
         .option.selected { border-color: var(--accent); background: rgba(138, 180, 248, 0.1); }
         .option.correct { background: rgba(52, 168, 83, 0.25) !important; border-color: var(--success) !important; }
         .option.wrong { background: rgba(234, 67, 53, 0.25) !important; border-color: var(--error) !important; }
         .option.disabled { pointer-events: none; }
 
         .feedback-card { display: none; margin-top: 20px; padding: 15px; background: #232425; border-left: 4px solid var(--accent); border-radius: 8px; }
+        
+        /* Navigation Buttons */
         .controls { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; }
         
-        button { padding: 12px 24px; border-radius: 24px; border: none; font-weight: 600; cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+        button { padding: 8px 16px; border-radius: 20px; border: none; font-weight: 600; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-primary { background: var(--accent); color: var(--bg-primary); }
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
         .btn-flag { color: var(--flag); border: 1px solid var(--flag); background: transparent; }
+        
+        /* Header specific buttons */
+        .btn-header { padding: 6px 14px; font-size: 0.85rem; }
 
-        /* --- REPORT VIEW (Full Screen Overlay) --- */
+        /* --- REPORT VIEW --- */
         #report-view { 
             display: none; 
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            position: absolute; top: 60px; left: 0; right: 0; bottom: 0; /* Below Header */
             background: #fff; color: #000; 
-            padding: 30px; 
+            padding: 20px; 
             overflow-y: auto; 
             z-index: 20;
         }
 
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px; text-align: center; }
-        .stat-box { background: #f1f3f4; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
-        .stat-val { font-size: 1.5rem; font-weight: bold; display: block; }
-        .stat-lbl { font-size: 0.75rem; text-transform: uppercase; color: #5f6368; }
+        .stat-box { background: #f1f3f4; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
+        .stat-val { font-size: 1.3rem; font-weight: bold; display: block; }
+        .stat-lbl { font-size: 0.7rem; text-transform: uppercase; color: #5f6368; }
         
-        .s-score { color: #202124; } 
-        .s-correct { color: #188038; } 
-        .s-wrong { color: #d93025; }
-        .s-left { color: #f29900; }
-
+        .s-score { color: #202124; } .s-correct { color: #188038; } .s-wrong { color: #d93025; } .s-left { color: #f29900; }
         .rep-item { border-bottom: 1px solid #dadce0; padding: 15px 0; }
         .rep-q { font-weight: 700; margin-bottom: 8px; color: #202124; }
         .rep-row { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 4px; }
@@ -179,20 +178,15 @@
             }
             
             .sidebar {
-                order: 2; width: 100%; height: 35vh; min-height: 200px; border-right: none; border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);
+                order: 2; width: 100%; height: 30vh; min-height: 180px; border-right: none; border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);
             }
-            
-            #btn-finish { flex-shrink: 0; margin-top: auto; }
             
             .palette-grid { grid-template-columns: repeat(6, 1fr); }
             .question-text { font-size: 1.1rem; }
-            
-            /* Report Mobile */
             .stats-grid { grid-template-columns: 1fr 1fr; }
-            #report-view { padding: 15px; }
         }
 
-        /* --- START SCREEN --- */
+        /* --- START OVERLAY --- */
         #start-screen { position: fixed; inset: 0; background: var(--bg-primary); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         .tooltip-wrap { position: relative; display: inline-block; }
         .tooltip-wrap::after { content: attr(data-tip); position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); width: 160px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; font-size: 0.75rem; opacity: 0; visibility: hidden; transition: 0.3s; pointer-events: none; z-index: 10; }
@@ -202,9 +196,9 @@
 <body>
 
 <div id="start-screen">
-    <h1 style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;">Kinetic Theory</h1>
+    <h1 style="font-size: 2.2rem; color: var(--accent); margin-bottom: 10px;">Kinetic Theory</h1>
     <p style="color: var(--text-dim); margin-bottom: 40px;">Quiz 4: Final Review</p>
-    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+    <div style="display: flex; gap: 20px;">
         <div class="tooltip-wrap" data-tip="Instant feedback.">
             <button class="btn-primary" onclick="startQuiz('practice')">Practice Mode</button>
         </div>
@@ -215,18 +209,19 @@
 </div>
 
 <header id="main-header">
-    <div class="header-left">
-        <h1 class="quiz-title">Physics: Chapter 12</h1>
+    <div class="quiz-title">Physics: Chapter 12</div>
+    <div class="header-actions">
+        <button class="btn-primary btn-header" id="btn-finish" onclick="showReport()">Submit Quiz</button>
+        <button class="btn-secondary btn-header" id="btn-pdf" style="display:none;" onclick="downloadPDF()">Download PDF</button>
     </div>
 </header>
 
 <div class="layout" id="quiz-layout">
     <div class="sidebar" id="sidebar">
-        <div class="palette-header" style="padding-bottom: 5px;">Question Palette</div>
+        <div class="palette-header">Question Palette</div>
         <div class="palette-scroll-area">
             <div class="palette-grid" id="p-grid"></div>
         </div>
-        <button class="btn-secondary" id="btn-finish" style="width: 100%; border-radius: 8px; justify-content: center;" onclick="showReport()">Submit Quiz</button>
     </div>
 
     <div class="main-content">
@@ -236,7 +231,7 @@
             <div id="q-options"></div>
             
             <div id="feedback" class="feedback-card">
-                <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 5px;">NCERT Reference: <span id="cite-ref"></span></div>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 5px;">Ref: <span id="cite-ref"></span></div>
                 <div id="hint-content" style="color: var(--text-main); font-size: 0.95rem;"></div>
             </div>
 
@@ -251,8 +246,7 @@
     </div>
 </div>
 
-<div id="report-view">
-    </div>
+<div id="report-view"></div>
 
 <script>
     /* 3. DATA ARRAY */
@@ -368,15 +362,18 @@
     function showReport() {
         if (!confirm("Submit Quiz?")) return;
         
-        // Hide Main Layout and Header
+        // Hide Main Layout
         document.getElementById('quiz-layout').style.display = 'none';
-        document.getElementById('main-header').style.display = 'none';
         
-        // Show Report View
+        // Toggle Header Buttons
+        document.getElementById('btn-finish').style.display = 'none';
+        document.getElementById('btn-pdf').style.display = 'block';
+        
+        // Show Report
         const reportDiv = document.getElementById('report-view');
         reportDiv.style.display = 'block';
-        document.body.style.overflow = 'auto'; // Enable scrolling
-
+        
+        // Generate Report Content
         let score = 0, wrong = 0, left = 0;
         let detailsHtml = '';
 
@@ -400,11 +397,7 @@
         const pct = Math.round((score / data.length) * 100);
         
         reportDiv.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0;">Results</h2>
-                <button class="btn-primary" onclick="downloadPDF()">Download PDF</button>
-            </div>
-            
+            <h2 style="margin-top:0;">Results</h2>
             <div class="stats-grid">
                 <div class="stat-box"><div class="stat-val s-score">${pct}%</div><div class="stat-lbl">Score</div></div>
                 <div class="stat-box"><div class="stat-val s-correct">${score}</div><div class="stat-lbl">Correct</div></div>
