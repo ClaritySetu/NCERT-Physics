@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>NCERT Quiz Template - Mobile Optimized</title>
+    <title>NCERT Quiz Template - Mobile Fixed</title>
     
     <script>
         window.MathJax = {
@@ -75,7 +75,6 @@
             background: var(--bg-secondary);
             border-right: 1px solid var(--border);
             padding: 15px;
-            overflow-y: auto;
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
@@ -83,12 +82,20 @@
 
         .palette-header { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
+        /* Important: Allow the grid to scroll, but keep the button static */
+        .palette-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px; /* Space between grid and button */
+        }
+
         .palette-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
         }
 
+        /* BUTTON SHAPES */
         .p-item {
             aspect-ratio: 1;
             display: flex; align-items: center; justify-content: center;
@@ -144,7 +151,7 @@
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
         .btn-flag { color: var(--flag); border: 1px solid var(--flag); background: transparent; }
 
-        /* --- MOBILE RESPONSIVENESS (The Magic) --- */
+        /* --- MOBILE RESPONSIVENESS FIXES --- */
         @media (max-width: 768px) {
             /* 1. Stack Layout Vertically */
             .layout { flex-direction: column; }
@@ -153,7 +160,7 @@
             .main-content {
                 order: 1;
                 width: 100%;
-                flex: 1; /* Takes available space */
+                flex: 1; 
                 padding: 20px;
                 border-bottom: 1px solid var(--border);
             }
@@ -162,10 +169,25 @@
             .sidebar {
                 order: 2;
                 width: 100%;
-                height: auto;
-                max-height: 250px; /* Limit height so it doesn't take over */
+                /* Fixed height for palette area on mobile */
+                height: 280px; 
                 border-right: none;
                 border-top: 1px solid var(--border);
+                flex-shrink: 0;
+                padding-bottom: 20px; /* Safe area for touch */
+            }
+
+            /* 4. Ensure Submit Button is always visible */
+            .palette-scroll-area {
+                /* The grid scrolls */
+                flex: 1;
+                overflow-y: auto;
+                margin-bottom: 10px;
+            }
+            
+            #btn-finish {
+                /* The button stays fixed at bottom of sidebar container */
+                width: 100%;
                 flex-shrink: 0;
             }
 
@@ -232,9 +254,13 @@
 
 <div class="layout">
     <div class="sidebar" id="sidebar">
-        <div class="palette-header" style="padding-bottom: 5px;">Question Palette</div>
-        <div class="palette-grid" id="p-grid"></div>
-        <button class="btn-secondary" style="width: 100%; margin-top: 15px; border-radius: 8px; justify-content: center;" onclick="showReport()">Submit Quiz</button>
+        <div class="palette-header">Question Palette</div>
+        
+        <div class="palette-scroll-area">
+            <div class="palette-grid" id="p-grid"></div>
+        </div>
+        
+        <button class="btn-secondary" id="btn-finish" style="width: 100%; border-radius: 8px; justify-content: center;" onclick="showReport()">Submit Quiz</button>
     </div>
 
     <div class="main-content">
@@ -263,7 +289,7 @@
 
 <script>
     /* =================================================================
-       6. DATA ARRAY (Quiz 4 Content)
+       6. DATA ARRAY
        ================================================================= */
     const data = [
         { s: "12.7 Mean Free Path", q: "Why do gas molecules moving at hundreds of meters per second take a long time to diffuse across a room?", o: ["They are heavy", "They collide incessantly", "Gravity slows them", "They are magnetic"], a: 1, r: "Sec 12.7", h: "Collisions change their direction randomly, so the net path is small." },
