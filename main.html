@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>NCERT Physics</title>
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* ================================================================= */
+        /* 3. THEME CONFIGURATION                                            */
+        /* ================================================================= */
+        :root {
+            --bg-primary: #131314;       
+            --bg-secondary: #1e1f20;     
+            --text-main: #e3e3e3;        
+            --text-dim: #c4c7c5;         
+            --accent: #8ab4f8;           
+            --success: #34a853;          
+            --error: #ea4335;            
+            --flag: #fbbc04;             
+            --border: #444746;           
+            --item-hover: #2d2e30;       
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* --- TOOLTIP STYLES --- */
+        .tooltip-wrap {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip-wrap::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.75rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 10;
+            border: 1px solid #555;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .tooltip-wrap:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- HEADER STYLES --- */
+        header {
+            padding: 12px 25px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .quiz-title { font-size: 1.2rem; color: var(--accent); margin: 0; }
+
+        /* --- LAYOUT STRUCTURE --- */
+        .layout { display: flex; flex: 1; overflow: hidden; }
+
+        /* Sidebar (Palette) Styles */
+        .sidebar {
+            width: 140px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 8px;
+        }
+
+        .p-item {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 12px 0px 12px 0px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            transition: 0.2s;
+        }
+
+        .p-item:hover { background: var(--item-hover); }
+        .p-item.current { border-color: var(--accent); color: var(--accent); background: rgba(138, 180, 248, 0.1); border-width: 2px; font-weight: bold; }
+        .p-item.attempted { background: var(--success); color: white; border-color: var(--success); }
+        .p-item.flagged { background: var(--flag); color: black; border-color: var(--flag); }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            padding: 20px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-container { max-width: 800px; margin: 0 auto; width: 100%; padding-bottom: 50px; }
+
+        /* Typography */
+        .section-label { color: var(--accent); font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
+        .question-text { font-size: 1.2rem; line-height: 1.5; margin-bottom: 25px; }
+
+        /* Option Buttons */
+        .option {
+            background: var(--bg-secondary);
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+
+        .option:hover:not(.disabled) { border-color: var(--accent); background: var(--item-hover); transform: translateX(5px); }
+        .option.selected { border-color: var(--accent); background: rgba(138, 180, 248, 0.1); }
+        .option.correct { background: rgba(52, 168, 83, 0.25) !important; border-color: var(--success) !important; }
+        .option.wrong { background: rgba(234, 67, 53, 0.25) !important; border-color: var(--error) !important; }
+        .option.disabled { cursor: default; }
+
+        /* Feedback Box */
+        .feedback-card { display: none; margin-top: 20px; padding: 15px; background: #1e1f20; border-left: 4px solid var(--accent); border-radius: 8px; }
+        .cite-tag { font-size: 0.75rem; color: var(--accent); font-weight: bold; display: block; margin-bottom: 5px; }
+
+        /* Controls */
+        .controls { margin-top: 30px; display: flex; justify-content: space-between; }
+        
+        button { padding: 10px 20px; border-radius: 20px; border: none; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        .btn-primary { background: var(--accent); color: var(--bg-primary); }
+        .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-flag { color: var(--flag); border: 1px solid var(--flag); background: transparent; }
+
+        /* --- REPORT VIEW STYLES --- */
+        #report-view { display: none; padding-bottom: 50px; color: #000; background: #fff; padding: 30px; border-radius: 8px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; text-align: center; }
+        .stat-box { padding: 15px; border-radius: 8px; background: #f5f5f5; border: 1px solid #ddd; }
+        .stat-val { font-size: 1.5rem; font-weight: bold; display: block; }
+        .stat-label { font-size: 0.8rem; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .s-score { color: #333; }
+        .s-correct { color: #2e7d32; }
+        .s-wrong { color: #c62828; }
+        .s-left { color: #f57c00; }
+
+        .report-card { background: #fff; padding: 15px; margin-bottom: 15px; border-bottom: 1px solid #eee; }
+        .report-q { font-weight: bold; margin-bottom: 8px; color: #222; font-size: 1rem; }
+        .report-ans { font-size: 0.9rem; margin-bottom: 5px; color: #444; }
+        .correct-ans { color: #2e7d32; font-weight: 600; }
+        .wrong-ans { color: #c62828; font-weight: 600; }
+        .report-hint { font-size: 0.85rem; color: #666; margin-top: 8px; font-style: italic; background: #f9f9f9; padding: 8px; border-left: 3px solid #8ab4f8; }
+
+        /* Start Overlay */
+        
+        #overlay {
+            position: fixed; inset: 0; background: var(--bg-primary); z-index: 999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        }
+    </style>
+</head>
+<!-- ===================== This commes on the first page, QUIZ and EXAM Mode Options ===================== -->
+<body>
+<div id="overlay">
+    <h1 style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;">PHYSICS NCERT Quiz</h1> 
+    <p style="color: var(--text-dim); margin-bottom: 40px;">Kinetic Theory of Gases</p>
+    
+    <div style="display: flex; gap: 20px;">
+        <div class="tooltip-wrap" data-tip="Instant feedback. See hints immediately.">
+            <button class="btn-primary" id="btn-practice">Practice Mode</button>
+        </div>
+        <div class="tooltip-wrap" data-tip="Simulation. Results shown at end.">
+            <button class="btn-secondary" id="btn-exam">Exam Mode</button>
+        </div>
+    </div>
+</div>
+<!-- ===================== This is what is written on each Question Page, top left heading ===================== -->
+<header>
+    <h1 class="quiz-title">Physics: Chapter 12</h1>
+    <button class="btn-primary" id="btn-download" style="display:none;" onclick="downloadPDF()">Download PDF</button>
+</header>
+
+<div class="layout">
+    <div class="sidebar" id="sidebar" style="display:none;">
+        <div class="palette-grid" id="p-grid"></div>
+        <button class="btn-secondary" style="width: 100%; margin-top: auto; border-radius: 8px;" id="btn-finish">Submit Quiz</button>
+    </div>
+
+    <div class="main-content">
+        <div id="quiz-view" class="question-container" style="display:none;">
+            <div id="q-section" class="section-label"></div>
+            <div id="q-text" class="question-text"></div>
+            <div id="q-options"></div>
+            
+            <div id="feedback" class="feedback-card">
+                <span id="cite-ref" class="cite-tag"></span>
+                <div id="hint-content"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn-flag" onclick="toggleFlag()">⚑ Flag</button>
+                <div>
+                    <button class="btn-secondary" onclick="nav(-1)">Previous</button>
+                    <button class="btn-primary" style="margin-left: 10px;" onclick="nav(1)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="report-view"></div>
+    </div>
+</div>
+
+<script>
+    /* =================================================================
+       6. DATA ARRAY: UPDATED WITH SECTION NUMBERS
+       =================================================================
+       r: Now uses "Sec X.Y" instead of "Page Z"
+    */
+    const data = [
+        { s: "12.5 Equipartition", q: "For a molecule free to move in space, how many coordinates are needed to specify its location?", o: ["One", "Two", "Three", "Four"], a: 2, r: "Sec 12.5", h: "Motion of a body as a whole in space needs three coordinates." },
+        { s: "12.5 Equipartition", q: "In thermal equilibrium, the average energy associated with each translational degree of freedom is:", o: ["$k_B T$", "$\\frac{1}{2} k_B T$", "$\\frac{3}{2} k_B T$", "Zero"], a: 1, r: "Sec 12.5", h: "Each translational term contributes $\\frac{1}{2} k_B T$." },
+        { s: "12.5 Equipartition", q: "A diatomic molecule like $O_2$ (rigid rotator) has how many rotational degrees of freedom?", o: ["One", "Two", "Three", "Zero"], a: 1, r: "Sec 12.5", h: "It can rotate about two independent axes normal to the interatomic axis." },
+        { s: "12.5 Equipartition", q: "Why is rotation along the line joining the atoms in a diatomic molecule typically ignored?", o: ["Zero mass", "Very small moment of inertia", "No rotation", "Gravity"], a: 1, r: "Sec 12.5", h: "Rotation along this axis has a very small moment of inertia." },
+        { s: "12.5 Equipartition", q: "A single vibrational mode contributes how many 'squared terms' to the total energy?", o: ["One", "Two", "Three", "None"], a: 1, r: "Sec 12.5", h: "One vibrational mode contributes both kinetic and potential energy terms." },
+        { s: "12.5 Equipartition", q: "The law of equipartition states that in equilibrium, each energy mode has an average energy of:", o: ["$k_B T$", "$\\frac{1}{2} k_B T$", "$\\frac{3}{2} k_B T$", "$RT$"], a: 1, r: "Sec 12.5", h: "Each mode gets $\\frac{1}{2} k_B T$." },
+        { s: "12.5 Equipartition", q: "While translational degrees contribute $\\frac{1}{2} k_B T$, each vibrational frequency contributes:", o: ["$\\frac{1}{2} k_B T$", "$k_B T$", "$\\frac{3}{2} k_B T$", "Zero"], a: 1, r: "Sec 12.5", h: "Vibration has 2 modes (kinetic+potential), so $2 \\times \\frac{1}{2} k_B T = k_B T$." },
+        { s: "12.6 Specific Heat", q: "For a monatomic gas, the molar specific heat at constant volume ($C_v$) is predicted to be:", o: ["$\\frac{1}{2} R$", "$R$", "$\\frac{3}{2} R$", "$\\frac{5}{2} R$"], a: 2, r: "Sec 12.6.1", h: "$C_v = dU/dT = \\frac{3}{2} R$." },
+        { s: "12.6 Specific Heat", q: "The relation $C_p - C_v = R$ is true for which types of ideal gases?", o: ["Only Monatomic", "Only Diatomic", "Only Polyatomic", "Any ideal gas"], a: 3, r: "Sec 12.6.1", h: "This relation holds true for any ideal gas." },
+        { s: "12.6 Specific Heat", q: "For a rigid diatomic gas, the predicted ratio of specific heats $\\gamma$ is:", o: ["5/3", "7/5", "9/7", "1.33"], a: 1, r: "Sec 12.6.2", h: "$C_p = \\frac{7}{2} R, C_v = \\frac{5}{2} R$." },
+        { s: "12.6 Specific Heat", q: "If a diatomic molecule has one vibrational mode in addition to translation and rotation, its $C_v$ is:", o: ["$\\frac{3}{2} R$", "$\\frac{5}{2} R$", "$\\frac{7}{2} R$", "$\\frac{9}{2} R$"], a: 2, r: "Sec 12.6.2", h: "Vibration adds $R$ to the rigid value ($\\frac{5}{2} R + R = \\frac{7}{2} R$)." },
+        { s: "12.6 Specific Heat", q: "A polyatomic molecule with 'f' vibrational modes is predicted to have $\\gamma$ equal to:", o: ["$\\frac{3+f}{4+f}$", "$\\frac{4+f}{3+f}$", "$\\frac{5+f}{3+f}$", "$\\frac{3}{2}$"], a: 1, r: "Sec 12.6.3", h: "Formula: $\\gamma = (4+f)/(3+f)$." },
+        { s: "12.6 Specific Heat", q: "Experimental specific heats for polyatomic gases are often higher than predicted because:", o: ["Non-ideal behavior", "Active vibrational modes", "Mass differences", "High Pressure"], a: 1, r: "Sec 12.6.3", h: "Agreement improves by including vibrational modes." },
+        { s: "12.6 Specific Heat", q: "An atom in a solid vibrating in 3D has an average energy of:", o: ["$\\frac{1}{2} k_B T$", "$\\frac{3}{2} k_B T$", "$3 k_B T$", "Zero"], a: 2, r: "Sec 12.6.4", h: "3D oscillation means 3 modes $\\times k_B T$." },
+        { s: "12.6 Specific Heat", q: "The predicted molar specific heat $C$ for most solids at room temperature is:", o: ["$R$", "$\\frac{3}{2} R$", "$3R$", "$6R$"], a: 2, r: "Sec 12.6.4", h: "$U = 3RT$, so $C = 3R$." },
+        { s: "12.6 Specific Heat", q: "Which element is an exception to the $C = 3R$ rule at room temperature?", o: ["Aluminium", "Copper", "Carbon", "Lead"], a: 2, r: "Sec 12.6.4", h: "Carbon has a significantly lower value ($6.1$ vs $24.9$)." },
+        { s: "12.6 Specific Heat", q: "In solids, why is $\\Delta Q \\approx \\Delta U$?", o: ["P is zero", "Volume change is negligible", "Energy constant", "It is liquid"], a: 1, r: "Sec 12.6.4", h: "Solids have negligible $\\Delta V$, so work $P\\Delta V$ is negligible." },
+        { s: "12.6 Specific Heat", q: "Equipartition of energy is a principle of:", o: ["Quantum mechanics", "Classical statistical mechanics", "Relativity", "Fluid dynamics"], a: 1, r: "Sec 12.5", h: "First proved by Maxwell using classical statistical mechanics." },
+        { s: "12.6 Specific Heat", q: "The 'rigid rotator' assumption for $O_2$ is valid at:", o: ["All Temps", "Moderate Temps", "Absolute Zero", "High Pressures"], a: 1, r: "Sec 12.6.2", h: "Valid at moderate temperatures." },
+        { s: "12.6 Specific Heat", q: "Which molecule has active vibrational modes even at moderate temperatures?", o: ["$O_2$", "$N_2$", "CO", "Argon"], a: 2, r: "Sec 12.6.2", h: "CO contributes vibrational energy even at moderate T." }
+    ];
+
+    /* ================================================================= */
+    /* 7. APP LOGIC                                                      */
+    /* ================================================================= */
+
+    // --- State Variables ---
+    let current = 0;
+    let mode = 'practice';
+    let answers = new Array(data.length).fill(null);
+    let flagged = new Array(data.length).fill(false);
+
+    // --- Event Listeners ---
+    document.getElementById('btn-practice').onclick = () => startQuiz('practice');
+    document.getElementById('btn-exam').onclick = () => startQuiz('exam');
+    document.getElementById('btn-finish').onclick = showReport;
+
+    // --- Logic Functions ---
+    function startQuiz(m) {
+        mode = m;
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('sidebar').style.display = 'flex';
+        document.getElementById('quiz-view').style.display = 'block';
+        renderPalette();
+        renderQ();
+    }
+
+    function renderPalette() {
+        const grid = document.getElementById('p-grid');
+        grid.innerHTML = '';
+        data.forEach((_, i) => {
+            const btn = document.createElement('div');
+            btn.className = `p-item ${i===current ? 'current' : ''} ${answers[i]!==null ? 'attempted' : ''} ${flagged[i] ? 'flagged' : ''}`;
+            btn.innerText = i + 1;
+            btn.onclick = () => { current = i; renderQ(); renderPalette(); };
+            grid.appendChild(btn);
+        });
+    }
+
+    function renderQ() {
+        const item = data[current];
+        document.getElementById('q-section').innerText = item.s;
+        document.getElementById('q-text').innerHTML = `Q${current + 1}: ${item.q}`;
+        
+        const optsDiv = document.getElementById('q-options');
+        optsDiv.innerHTML = '';
+
+        item.o.forEach((optText, idx) => {
+            const div = document.createElement('div');
+            let cls = 'option';
+            
+            if (answers[current] !== null) {
+                cls += ' disabled';
+                if (mode === 'practice') {
+                    if (idx === item.a) cls += ' correct';
+                    else if (idx === answers[current]) cls += ' wrong';
+                } else {
+                    if (idx === answers[current]) cls += ' selected';
+                }
+            }
+            
+            div.className = cls;
+            div.innerHTML = optText;
+            div.onclick = () => selectAnswer(idx);
+            optsDiv.appendChild(div);
+        });
+
+        const fb = document.getElementById('feedback');
+        if (mode === 'practice' && answers[current] !== null) {
+            fb.style.display = 'block';
+            document.getElementById('cite-ref').innerText = "NCERT Ref: " + item.r;
+            document.getElementById('hint-content').innerText = item.h;
+        } else {
+            fb.style.display = 'none';
+        }
+
+        if (window.MathJax) MathJax.typesetPromise();
+    }
+
+    function selectAnswer(idx) {
+        if (answers[current] !== null) return;
+        answers[current] = idx;
+        renderQ();
+        renderPalette();
+    }
+
+    function nav(dir) {
+        const next = current + dir;
+        if (next >= 0 && next < data.length) {
+            current = next;
+            renderQ();
+            renderPalette();
+        }
+    }
+
+    function toggleFlag() {
+        flagged[current] = !flagged[current];
+        renderPalette();
+    }
+
+    function showReport() {
+        if (!confirm("Submit Quiz and View Report?")) return;
+
+        document.getElementById('sidebar').style.display = 'none';
+        document.getElementById('quiz-view').style.display = 'none';
+        document.getElementById('btn-download').style.display = 'block';
+        document.body.style.overflow = 'auto'; // Enable scrolling for report
+
+        const reportDiv = document.getElementById('report-view');
+        reportDiv.style.display = 'block';
+        
+        let score = 0, unanswered = 0, wrong = 0;
+        let htmlList = '';
+
+        data.forEach((item, i) => {
+            const userAns = answers[i];
+            
+            if (userAns === null) {
+                unanswered++;
+            } else if (userAns === item.a) {
+                score++;
+            } else {
+                wrong++;
+            }
+
+            const userAnsText = (userAns !== null) ? item.o[userAns] : 'Unanswered';
+            let statusHTML = '';
+            
+            if (userAns === item.a) {
+                statusHTML = `<div class="report-ans">Your Answer: <span class="correct-ans">${userAnsText}</span></div>`;
+            } else {
+                statusHTML = `<div class="report-ans">Your Answer: <span class="wrong-ans">${userAnsText}</span></div>
+                              <div class="report-ans correct-ans">Correct Answer: ${item.o[item.a]}</div>`;
+            }
+
+            htmlList += `
+            <div class="report-card">
+                <div class="report-q">Q${i+1}: ${item.q}</div>
+                ${statusHTML}
+                <div class="report-hint"><strong>Hint:</strong> ${item.h} (Ref: ${item.r})</div>
+            </div>`;
+        });
+
+        const percentage = Math.round((score / data.length) * 100);
+
+        const statsHTML = `
+            <h2 style="text-align:center; margin-bottom:20px; color:#333;">Final Performance Report</h2>
+            <div class="stats-grid">
+                <div class="stat-box"><span class="stat-val s-score">${percentage}%</span><span class="stat-label">Score</span></div>
+                <div class="stat-box"><span class="stat-val s-correct">${score}</span><span class="stat-label">Correct</span></div>
+                <div class="stat-box"><span class="stat-val s-wrong">${wrong}</span><span class="stat-label">Incorrect</span></div>
+                <div class="stat-box"><span class="stat-val s-left">${unanswered}</span><span class="stat-label">Left</span></div>
+            </div>
+        `;
+
+        reportDiv.innerHTML = statsHTML + htmlList;
+
+        if (window.MathJax) MathJax.typesetPromise();
+    }
+
+    function downloadPDF() {
+        const element = document.getElementById('report-view');
+        const opt = {
+            margin: 10,
+            filename: 'KTG_Quiz_Report.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+</script>
+</body>
+</html>
